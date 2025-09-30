@@ -141,6 +141,17 @@ def determine_action(local_meta, peer_meta):
     Returns one of:
     'upload', 'upload_new', 'download', 'download_new', or None (skip)
     """
+    # If either is a directory
+    if (local_meta and local_meta.get("is_dir")) or (peer_meta and
+                                                     peer_meta.get("is_dir")):
+        # Directories: only create if missing
+        if local_meta and not peer_meta:
+            return "upload_new"
+        elif peer_meta and not local_meta:
+            return "download_new"
+        else:
+            return None  # Both exist → skip
+    # File logic
     if local_meta and peer_meta:
         if peer_meta["mtime"] > local_meta["mtime"]:
             return "download"
