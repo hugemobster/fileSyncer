@@ -40,8 +40,15 @@ def should_ignore(rel_path, ignore_patterns):
 def get_file_list(folder, ignore_patterns):
     folder = Path(folder).resolve()
     file_list = {}
-    for root, _, files in os.walk(folder):
+    for root, dirs, files in os.walk(folder):
         rel_root = Path(root).relative_to(folder)
+
+        for d in dirs:
+            rel_path = rel_root / d
+            if should_ignore(rel_path, ignore_patterns):
+                continue
+            file_list[str(rel_path)] = {"is_dir": True}
+
         for file in files:
             rel_path = rel_root / file
             if should_ignore(rel_path, ignore_patterns):
